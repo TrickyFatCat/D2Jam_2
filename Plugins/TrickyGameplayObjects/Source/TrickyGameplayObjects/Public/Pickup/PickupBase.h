@@ -88,7 +88,6 @@ protected:
 	{
 	}
 
-private:
 	/**
 	 * Determines if the actor will be destroyed after successful activation
 	 */

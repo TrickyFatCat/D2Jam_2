@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "D2Jam_2/PlayerCharacter/D2JPlayerInterface.h"
 #include "GameplayObject/GameplayObjectStateControllerComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AD2JStarPickup::AD2JStarPickup()
@@ -17,6 +18,8 @@ AD2JStarPickup::AD2JStarPickup()
 	MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 
 	StateControllerComponent = CreateDefaultSubobject<UGameplayObjectStateControllerComponent>(TEXT("StateController"));
+
+	bDestroyAfterActivation = false;
 }
 
 #if WITH_EDITOR
@@ -26,12 +29,12 @@ void AD2JStarPickup::PostEditChangeProperty(struct FPropertyChangedEvent& Proper
 
 	const EGameplayObjectState InitialState = bIsActiveOnStart
 		                                          ? EGameplayObjectState::Active
-		                                          : EGameplayObjectState::Disabled;
+		                                          : EGameplayObjectState::Inactive;
 	StateControllerComponent->SetInitialState(InitialState);
 
 	const ECollisionEnabled::Type CollisionType = bIsActiveOnStart
-		                                              ? ECollisionEnabled::NoCollision
-		                                              : ECollisionEnabled::QueryOnly;
+		                                              ? ECollisionEnabled::QueryOnly
+		                                              : ECollisionEnabled::NoCollision;
 	ActivationTrigger->SetCollisionEnabled(CollisionType);
 
 	MeshComponent->SetHiddenInGame(!bIsActiveOnStart);
@@ -66,6 +69,13 @@ bool AD2JStarPickup::CanBeActivated_Implementation(AActor* Activator)
 void AD2JStarPickup::HandleActivationSuccess_Implementation(AActor* Activator)
 {
 	Cast<ID2JPlayerInterface>(Activator)->AddStar();
+
+	if (IsValid(NextStar))
+	{
+		Execute_ActivateGameplayObject(NextStar, true);
+	}
+
+	Execute_DeactivateGameplayObject(StateControllerComponent, true);
 }
 
 void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent* Component,
@@ -77,11 +87,35 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 	case EGameplayObjectState::Active:
 		MeshComponent->SetHiddenInGame(false);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		MeshComponent->SetHiddenInGame(false);
+
+		if (LevelToLoad.GetAssetName() != "")
+		{
+			FLatentActionInfo LatentActionInfo;
+			LatentActionInfo.CallbackTarget = this;
+			LatentActionInfo.ExecutionFunction = FName("OnLevelLoaded");
+			LatentActionInfo.UUID = GetUniqueID();
+			LatentActionInfo.Linkage = 0;
+			UGameplayStatics::LoadStreamLevelBySoftObjectPtr(this,
+			                                                 LevelToLoad,
+			                                                 true,
+			                                                 true,
+			                                                 LatentActionInfo);
+		}
 		break;
 
 	case EGameplayObjectState::Inactive:
 		MeshComponent->SetHiddenInGame(true);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		MeshComponent->SetHiddenInGame(true);
 		break;
 	}
+}
+
+void AD2JStarPickup::OnLevelLoaded()
+{
+#if WITH_EDITOR
+	UE_LOG(LogTemp, Log, TEXT("Sublevel loaded."))
+#endif
 }
