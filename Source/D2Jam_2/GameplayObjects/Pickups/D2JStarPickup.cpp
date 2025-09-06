@@ -30,8 +30,8 @@ void AD2JStarPickup::PostEditChangeProperty(struct FPropertyChangedEvent& Proper
 	StateControllerComponent->SetInitialState(InitialState);
 
 	const ECollisionEnabled::Type CollisionType = bIsActiveOnStart
-		                                              ? ECollisionEnabled::NoCollision
-		                                              : ECollisionEnabled::QueryOnly;
+		                                              ? ECollisionEnabled::QueryOnly
+		                                              : ECollisionEnabled::NoCollision;
 	ActivationTrigger->SetCollisionEnabled(CollisionType);
 
 	MeshComponent->SetHiddenInGame(!bIsActiveOnStart);
