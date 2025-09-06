@@ -176,6 +176,9 @@ private:
 		Category=GameState)
 	EGameInactivityReason InitialInactivityReason = EGameInactivityReason::Transition;
 
+	UPROPERTY(EditDefaultsOnly, Category=GameState)
+	float CameraFadeOutDuration = 0.5f;
+
 	/**
 	 * Determines the duration of the preparation phase in seconds before the game transitions to the active state.
 	 * This timer is used only if the current inactivity reason is Preparation.
