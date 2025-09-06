@@ -4,7 +4,7 @@
 #include "D2JTeleporterBase.h"
 
 #include "Components/SphereComponent.h"
-#include "D2Jam_2/PlayerCharacter/D2JPlayerInterface.h"
+#include "GameplayObject/GameplayObjectStateControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -19,6 +19,22 @@ AD2JTeleporterBase::AD2JTeleporterBase()
 	ActivationTrigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Overlap);
 }
 
+void AD2JTeleporterBase::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+
+	const EGameplayObjectState InitialState = bIsActiveOnStart
+		                                          ? EGameplayObjectState::Active
+		                                          : EGameplayObjectState::Inactive;
+	StateControllerComponent->SetInitialState(InitialState);
+
+	const ECollisionEnabled::Type CollisionType = bIsActiveOnStart
+		                                              ? ECollisionEnabled::QueryOnly
+		                                              : ECollisionEnabled::NoCollision;
+	ActivationTrigger->SetCollisionEnabled(CollisionType);
+}
+
 void AD2JTeleporterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -27,6 +43,28 @@ void AD2JTeleporterBase::PostInitializeComponents()
 	{
 		ActivationTrigger->OnComponentBeginOverlap.AddUniqueDynamic(this,
 		                                                            &AD2JTeleporterBase::HandleTriggerBeginOverlap);
+
+		StateControllerComponent->OnGameplayObjectStateChanged.AddDynamic(this,
+		                                                                 &AD2JTeleporterBase::HandleStateChanged);
+	}
+}
+
+void AD2JTeleporterBase::HandleStateChanged(UGameplayObjectStateControllerComponent* Component,
+                                            EGameplayObjectState NewState,
+                                            bool bChangedImmediately)
+{
+	
+	switch (NewState)
+	{
+	case EGameplayObjectState::Active:
+		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+		break;
+
+	case EGameplayObjectState::Inactive:
+		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		break;
 	}
 }
 
@@ -37,8 +75,9 @@ void AD2JTeleporterBase::HandleTriggerBeginOverlap(UPrimitiveComponent* Overlapp
                                                    bool bFromSweep,
                                                    const FHitResult& SweepResult)
 {
-	if (!OtherActor->GetClass()->ImplementsInterface(UD2JPlayerInterface::StaticClass()))
+	if (ActivationDelay <= 0.f)
 	{
+		HandleActivationTimerFinished();
 		return;
 	}
 

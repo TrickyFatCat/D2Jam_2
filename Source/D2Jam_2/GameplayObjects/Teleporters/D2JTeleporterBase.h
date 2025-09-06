@@ -16,10 +16,14 @@ class D2JAM_2_API AD2JTeleporterBase : public AD2JGameplayObjectBase
 public:
 	AD2JTeleporterBase();
 
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
 	virtual void PostInitializeComponents() override;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Component")
 	TObjectPtr<USphereComponent> ActivationTrigger = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
@@ -28,9 +32,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
 	float CameraFadeInDuration = 0.5f;
 
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Teleporter")
+	TSoftObjectPtr<UWorld> SublevelToActivate = nullptr;
+
 	UPROPERTY(BlueprintReadOnly, Category="Teleporter")
 	FTimerHandle ActivationTimerHandle;
 
+	UFUNCTION()
+	virtual void HandleStateChanged(UGameplayObjectStateControllerComponent* Component,
+	                                EGameplayObjectState NewState,
+	                                bool bChangedImmediately);
+	
 	UFUNCTION()
 	virtual void HandleTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 	                                       AActor* OtherActor,
