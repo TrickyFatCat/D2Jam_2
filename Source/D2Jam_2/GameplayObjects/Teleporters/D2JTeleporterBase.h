@@ -26,6 +26,9 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Component")
 	TObjectPtr<USphereComponent> ActivationTrigger = nullptr;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UMeshComponent> MeshComponent = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
 	float ActivationDelay = 3.f;
 

@@ -4,6 +4,7 @@
 #include "D2JTeleporterBase.h"
 
 #include "Components/SphereComponent.h"
+#include "Components/MeshComponent.h"
 #include "GameplayObject/GameplayObjectStateControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -17,6 +18,10 @@ AD2JTeleporterBase::AD2JTeleporterBase()
 	ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	ActivationTrigger->SetCollisionResponseToAllChannels(ECR_Ignore);
 	ActivationTrigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Overlap);
+
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	MeshComponent->SetupAttachment(GetRootComponent());
+	MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 void AD2JTeleporterBase::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
@@ -28,6 +33,8 @@ void AD2JTeleporterBase::PostEditChangeProperty(struct FPropertyChangedEvent& Pr
 		                                          ? EGameplayObjectState::Active
 		                                          : EGameplayObjectState::Inactive;
 	StateControllerComponent->SetInitialState(InitialState);
+
+	MeshComponent->SetHiddenInGame(!bIsActiveOnStart);
 
 	const ECollisionEnabled::Type CollisionType = bIsActiveOnStart
 		                                              ? ECollisionEnabled::QueryOnly
@@ -58,12 +65,12 @@ void AD2JTeleporterBase::HandleStateChanged(UGameplayObjectStateControllerCompon
 	{
 	case EGameplayObjectState::Active:
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
+		MeshComponent->SetHiddenInGame(false);
 		break;
 
 	case EGameplayObjectState::Inactive:
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+		MeshComponent->SetHiddenInGame(true);
 		break;
 	}
 }
