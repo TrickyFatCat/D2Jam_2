@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "D2JPlayerCharacter.generated.h"
 
+enum class EGameInactivityReason : uint8;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -83,4 +84,13 @@ protected:
 	                          const UDamageType* DamageType,
 	                          AController* InstigatedBy,
 	                          AActor* DamageCauser);
+
+	UFUNCTION()
+	void HandleGameStarted();
+
+	UFUNCTION()
+	void HandleGameStopped(const EGameInactivityReason InactivityReason);
+
+	UFUNCTION()
+	void HandleGameFinished(const EGameResult Result);
 };

@@ -8,7 +8,7 @@
 #include "TrickyGameModeLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "AI/NavigationSystemBase.h"
+#include "TrickyGameModeBase.h"
 #include "Kismet/KismetMathLibrary.h"
 
 AD2JPlayerCharacter::AD2JPlayerCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -35,6 +35,20 @@ void AD2JPlayerCharacter::BeginPlay()
 	SpawnLocation = GetActorLocation();
 
 	OnTakeAnyDamage.AddUniqueDynamic(this, &AD2JPlayerCharacter::HandleAnyDamageTaken);
+	
+	ATrickyGameModeBase* GameMode = UTrickyGameModeLibrary::GetTrickyGameMode(this);
+	
+	if (IsValid(GameMode))
+	{
+		GameMode->OnGameStarted.AddDynamic(this, &AD2JPlayerCharacter::HandleGameStarted);
+		GameMode->OnGameStopped.AddDynamic(this, &AD2JPlayerCharacter::HandleGameStopped);
+		GameMode->OnGameFinished.AddDynamic(this, &AD2JPlayerCharacter::HandleGameFinished);
+
+		if (GameMode->GetCurrentState() == ETrickyGameState::Inactive)
+		{
+			ToggleInput(false);
+		}
+	}
 }
 
 void AD2JPlayerCharacter::Tick(float DeltaTime)
@@ -65,11 +79,6 @@ void AD2JPlayerCharacter::AddStar()
 	{
 		Stars.ClampToMax();
 		OnStarAdded.Broadcast(Stars);
-	}
-
-	if (Stars.ReachedMaxValue())
-	{
-		UTrickyGameModeLibrary::FinishGame(this, EGameResult::Win);
 	}
 }
 
@@ -139,4 +148,19 @@ void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
 {
 	FailureCounter++;
 	OnFailureCounterIncreased.Broadcast(FailureCounter);
+}
+
+void AD2JPlayerCharacter::HandleGameStarted()
+{
+	ToggleInput(true);
+}
+
+void AD2JPlayerCharacter::HandleGameStopped(const EGameInactivityReason InactivityReason)
+{
+	ToggleInput(false);
+}
+
+void AD2JPlayerCharacter::HandleGameFinished(const EGameResult Result)
+{
+	ToggleInput(false);
 }
