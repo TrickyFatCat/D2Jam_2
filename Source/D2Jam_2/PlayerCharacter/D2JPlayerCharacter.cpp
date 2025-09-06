@@ -32,6 +32,8 @@ void AD2JPlayerCharacter::BeginPlay()
 	}
 
 	SpawnLocation = GetActorLocation();
+
+	OnTakeAnyDamage.AddUniqueDynamic(this, &AD2JPlayerCharacter::HandleAnyDamageTaken);
 }
 
 void AD2JPlayerCharacter::Tick(float DeltaTime)
@@ -105,4 +107,14 @@ void AD2JPlayerCharacter::Move(const FInputActionValue& Value)
 void AD2JPlayerCharacter::Respawn()
 {
 	SetActorLocation(SpawnLocation);
+}
+
+void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
+                                               float Damage,
+                                               const UDamageType* DamageType,
+                                               AController* InstigatedBy,
+                                               AActor* DamageCauser)
+{
+	FailureCounter++;
+	OnFailureCounterIncreased.Broadcast(FailureCounter);
 }
