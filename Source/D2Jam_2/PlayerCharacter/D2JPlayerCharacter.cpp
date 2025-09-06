@@ -30,6 +30,8 @@ void AD2JPlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(MappingContext, 0);
 		}
 	}
+
+	SpawnLocation = GetActorLocation();
 }
 
 void AD2JPlayerCharacter::Tick(float DeltaTime)
@@ -73,6 +75,11 @@ void AD2JPlayerCharacter::GetStarsData(FTrickyPropertyInt& OutStarsData) const
 	OutStarsData = Stars;
 }
 
+void AD2JPlayerCharacter::SetSpawnLocation(const FVector NewSpawnLocation)
+{
+	SpawnLocation = NewSpawnLocation;
+}
+
 void AD2JPlayerCharacter::CalculateDirectionFromControls(const FVector2D& ControlValue, FVector& OutDirection) const
 {
 	FVector2D Direction2D = FVector2D::Zero();
@@ -93,4 +100,9 @@ void AD2JPlayerCharacter::Move(const FInputActionValue& Value)
 	CalculateDirectionFromControls(ControlVector, MovementDirection);
 
 	AddMovementInput(MovementDirection, ControlLength);
+}
+
+void AD2JPlayerCharacter::Respawn()
+{
+	SetActorLocation(SpawnLocation);
 }

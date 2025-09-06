@@ -37,9 +37,14 @@ public:
 
 	virtual void GetStarsData(FTrickyPropertyInt& OutStarsData) const override;
 
+	virtual void SetSpawnLocation(const FVector NewSpawnLocation) override;
+
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Player")
 	FTrickyPropertyInt Stars {0, 0, 3};
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Player")
+	FVector SpawnLocation = FVector::ZeroVector;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	float YawOffset = -45.0f;
@@ -58,4 +63,7 @@ protected:
 	
 	UFUNCTION()
 	void Move(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable)
+	void Respawn();
 };

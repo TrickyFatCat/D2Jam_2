@@ -68,7 +68,9 @@ bool AD2JStarPickup::CanBeActivated_Implementation(AActor* Activator)
 
 void AD2JStarPickup::HandleActivationSuccess_Implementation(AActor* Activator)
 {
-	Cast<ID2JPlayerInterface>(Activator)->AddStar();
+	ID2JPlayerInterface* PlayerInterface = Cast<ID2JPlayerInterface>(Activator);
+	PlayerInterface->AddStar();
+	PlayerInterface->SetSpawnLocation(GetActorLocation());
 
 	if (IsValid(NextStar))
 	{
@@ -76,6 +78,7 @@ void AD2JStarPickup::HandleActivationSuccess_Implementation(AActor* Activator)
 	}
 
 	Execute_DeactivateGameplayObject(StateControllerComponent, true);
+
 }
 
 void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent* Component,

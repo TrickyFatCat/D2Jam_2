@@ -28,4 +28,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category=D2JPlayerInterface)
 	virtual void GetStarsData(FTrickyPropertyInt& OutStarsData) const = 0;
+
+	UFUNCTION()
+	virtual void SetSpawnLocation(const FVector NewSpawnLocation) = 0;
 };
