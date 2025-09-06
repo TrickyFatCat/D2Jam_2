@@ -17,6 +17,8 @@ AD2JStarPickup::AD2JStarPickup()
 	MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 
 	StateControllerComponent = CreateDefaultSubobject<UGameplayObjectStateControllerComponent>(TEXT("StateController"));
+
+	bDestroyAfterActivation = false;
 }
 
 #if WITH_EDITOR
@@ -26,7 +28,7 @@ void AD2JStarPickup::PostEditChangeProperty(struct FPropertyChangedEvent& Proper
 
 	const EGameplayObjectState InitialState = bIsActiveOnStart
 		                                          ? EGameplayObjectState::Active
-		                                          : EGameplayObjectState::Disabled;
+		                                          : EGameplayObjectState::Inactive;
 	StateControllerComponent->SetInitialState(InitialState);
 
 	const ECollisionEnabled::Type CollisionType = bIsActiveOnStart
@@ -66,6 +68,13 @@ bool AD2JStarPickup::CanBeActivated_Implementation(AActor* Activator)
 void AD2JStarPickup::HandleActivationSuccess_Implementation(AActor* Activator)
 {
 	Cast<ID2JPlayerInterface>(Activator)->AddStar();
+
+	if (IsValid(NextStar))
+	{
+		Execute_ActivateGameplayObject(NextStar, true);
+	}
+
+	Execute_DeactivateGameplayObject(StateControllerComponent, true);
 }
 
 void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent* Component,
@@ -77,11 +86,14 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 	case EGameplayObjectState::Active:
 		MeshComponent->SetHiddenInGame(false);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		MeshComponent->SetHiddenInGame(false);
 		break;
 
 	case EGameplayObjectState::Inactive:
 		MeshComponent->SetHiddenInGame(true);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		MeshComponent->SetHiddenInGame(true);
 		break;
 	}
 }
