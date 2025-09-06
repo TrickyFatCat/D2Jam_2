@@ -80,6 +80,11 @@ void AD2JPlayerCharacter::AddStar()
 		Stars.ClampToMax();
 		OnStarAdded.Broadcast(Stars);
 	}
+
+	if (Stars.ReachedMaxValue())
+	{
+		OnAllStarsGathered.Broadcast();
+	}
 }
 
 void AD2JPlayerCharacter::GetStarsData(FTrickyPropertyInt& OutStarsData) const

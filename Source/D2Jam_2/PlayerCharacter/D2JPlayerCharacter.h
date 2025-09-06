@@ -15,6 +15,8 @@ struct FInputActionValue;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStarAddedDynamicSignature, const FTrickyPropertyInt&, CurrentStars);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllStarsGatheredDynamicSignature);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFailureCounterIncreasedDynamicSignature, int32, CurrentFailures);
 
 UCLASS()
@@ -35,6 +37,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Player")
 	FOnStarAddedDynamicSignature OnStarAdded;
+
+	UPROPERTY(BlueprintAssignable, Category="Player")
+	FOnAllStarsGatheredDynamicSignature OnAllStarsGathered;
 
 	UPROPERTY(BlueprintAssignable, Category="Player")
 	FOnFailureCounterIncreasedDynamicSignature OnFailureCounterIncreased;
