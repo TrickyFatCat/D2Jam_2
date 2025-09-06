@@ -3,13 +3,15 @@
 
 #include "D2JPlayerCharacter.h"
 
+#include "D2JPlayerMovementComponent.h"
 #include "GameStateControllerInterface.h"
 #include "TrickyGameModeLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetMathLibrary.h"
 
-AD2JPlayerCharacter::AD2JPlayerCharacter()
+AD2JPlayerCharacter::AD2JPlayerCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UD2JPlayerMovementComponent>(TEXT("CharMoveComp")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -17,7 +19,7 @@ AD2JPlayerCharacter::AD2JPlayerCharacter()
 void AD2JPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 
 	if (IsValid(PlayerController))
@@ -28,6 +30,10 @@ void AD2JPlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(MappingContext, 0);
 		}
 	}
+
+	SpawnLocation = GetActorLocation();
+
+	OnTakeAnyDamage.AddUniqueDynamic(this, &AD2JPlayerCharacter::HandleAnyDamageTaken);
 }
 
 void AD2JPlayerCharacter::Tick(float DeltaTime)
@@ -43,6 +49,12 @@ void AD2JPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		//Movement
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AD2JPlayerCharacter::Move);
+
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AD2JPlayerCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction,
+		                                   ETriggerEvent::Completed,
+		                                   this,
+		                                   &AD2JPlayerCharacter::StopJumping);
 	}
 }
 
@@ -65,6 +77,11 @@ void AD2JPlayerCharacter::GetStarsData(FTrickyPropertyInt& OutStarsData) const
 	OutStarsData = Stars;
 }
 
+void AD2JPlayerCharacter::SetSpawnLocation(const FVector NewSpawnLocation)
+{
+	SpawnLocation = NewSpawnLocation;
+}
+
 void AD2JPlayerCharacter::CalculateDirectionFromControls(const FVector2D& ControlValue, FVector& OutDirection) const
 {
 	FVector2D Direction2D = FVector2D::Zero();
@@ -85,4 +102,19 @@ void AD2JPlayerCharacter::Move(const FInputActionValue& Value)
 	CalculateDirectionFromControls(ControlVector, MovementDirection);
 
 	AddMovementInput(MovementDirection, ControlLength);
+}
+
+void AD2JPlayerCharacter::Respawn()
+{
+	SetActorLocation(SpawnLocation);
+}
+
+void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
+                                               float Damage,
+                                               const UDamageType* DamageType,
+                                               AController* InstigatedBy,
+                                               AActor* DamageCauser)
+{
+	FailureCounter++;
+	OnFailureCounterIncreased.Broadcast(FailureCounter);
 }
