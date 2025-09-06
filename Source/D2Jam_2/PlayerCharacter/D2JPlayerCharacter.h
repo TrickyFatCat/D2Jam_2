@@ -56,6 +56,18 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Player")
 	FTrickyPropertyInt Stars{0, 0, 3};
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float DeathDuration = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float RespawnFadeInDuration = 0.2f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float RespawnDuration = 0.2f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float RespawnFadeOutDuration = 0.2f;
+
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Player")
 	int32 FailureCounter = 0;
 
@@ -79,6 +91,21 @@ protected:
 
 	UFUNCTION()
 	void Move(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void StartRespawn();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnRespawnStarted();
+	
+	UFUNCTION()
+	void FinishRespawn();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnRespawnFinished();
+
+	UFUNCTION()
+	void HandleRespawnFinished();
 
 	UFUNCTION(BlueprintCallable)
 	void Respawn();
