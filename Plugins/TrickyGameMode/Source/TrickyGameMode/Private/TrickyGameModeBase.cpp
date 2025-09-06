@@ -4,7 +4,6 @@
 #include "TrickyGameModeBase.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
-#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTrickyGameMode);
 
@@ -14,13 +13,6 @@ void ATrickyGameModeBase::StartPlay()
 
 	CurrentInactivityReason = InitialInactivityReason;
 	OnGameStopped.Broadcast(CurrentInactivityReason);
-
-	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
-
-	if (IsValid(CameraManager))
-	{
-		CameraManager->StartCameraFade(1.0f, 0.0f, CameraFadeOutDuration, FLinearColor::Black, true, false);
-	}
 
 	if (CurrentInactivityReason == EGameInactivityReason::Preparation && PreparationDuration > 0.0f)
 	{

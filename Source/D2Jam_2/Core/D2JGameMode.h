@@ -13,4 +13,14 @@ UCLASS()
 class D2JAM_2_API AD2JGameMode : public ATrickyGameModeBase
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void StartPlay() override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category=GameState)
+	float CameraFadeOutDuration = 0.5f;
+
+	UFUNCTION()
+	void HandleCameraFadeOutFinished();
 };
