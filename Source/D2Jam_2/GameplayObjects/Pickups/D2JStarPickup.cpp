@@ -4,6 +4,7 @@
 #include "D2JStarPickup.h"
 
 #include "Components/SphereComponent.h"
+#include "D2Jam_2/GameplayObjects/Teleporters/D2JTeleporterBase.h"
 #include "D2Jam_2/PlayerCharacter/D2JPlayerInterface.h"
 #include "GameplayObject/GameplayObjectStateControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -92,7 +93,7 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		MeshComponent->SetHiddenInGame(false);
 
-		if (LevelToLoad.GetAssetName() != "")
+		if (SublevelToLoad.GetAssetName() != "")
 		{
 			FLatentActionInfo LatentActionInfo;
 			LatentActionInfo.CallbackTarget = this;
@@ -100,7 +101,7 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 			LatentActionInfo.UUID = GetUniqueID();
 			LatentActionInfo.Linkage = 0;
 			UGameplayStatics::LoadStreamLevelBySoftObjectPtr(this,
-			                                                 LevelToLoad,
+			                                                 SublevelToLoad,
 			                                                 true,
 			                                                 true,
 			                                                 LatentActionInfo);
@@ -112,6 +113,11 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		MeshComponent->SetHiddenInGame(true);
+
+		if (TeleporterToActivate.IsValid())
+		{
+			Execute_ActivateGameplayObject(TeleporterToActivate.Get(), true);
+		}
 		break;
 	}
 }

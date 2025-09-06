@@ -44,6 +44,8 @@ public:
 
 	virtual void SetSpawnLocation(const FVector NewSpawnLocation) override;
 
+	virtual void ToggleInput(const bool bIsEnabled) override;
+
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Player")
 	FTrickyPropertyInt Stars{0, 0, 3};
