@@ -36,6 +36,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UGameplayObjectStateControllerComponent> StateControllerComponent = nullptr;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="GameplayObject")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="GameplayObject")
 	bool bIsActiveOnStart = true;
 };
