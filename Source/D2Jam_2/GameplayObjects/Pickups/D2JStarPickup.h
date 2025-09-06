@@ -7,6 +7,7 @@
 #include "Pickup/PickupAutomaticBase.h"
 #include "D2JStarPickup.generated.h"
 
+class AD2JTeleporterBase;
 class UGameplayObjectStateControllerComponent;
 
 UCLASS()
@@ -43,7 +44,10 @@ protected:
 	TObjectPtr<AD2JStarPickup> NextStar = nullptr;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Pickup")
-	TSoftObjectPtr<UWorld> LevelToLoad = nullptr;
+	TSoftObjectPtr<UWorld> SublevelToLoad = nullptr;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Pickup")
+	TWeakObjectPtr<AD2JTeleporterBase> TeleporterToActivate = nullptr;
 
 	virtual bool CanBeActivated_Implementation(AActor* Activator) override;
 
