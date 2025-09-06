@@ -31,4 +31,7 @@ public:
 
 	UFUNCTION()
 	virtual void SetSpawnLocation(const FVector NewSpawnLocation) = 0;
+
+	UFUNCTION()
+	virtual void ToggleInput(const bool bIsEnabled) = 0;
 };
