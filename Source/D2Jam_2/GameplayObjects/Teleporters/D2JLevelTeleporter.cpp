@@ -3,7 +3,7 @@
 
 #include "D2JLevelTeleporter.h"
 
-#include "D2Jam_2/PlayerCharacter/D2JPlayerInterface.h"
+#include "TrickyGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -17,7 +17,7 @@ void AD2JLevelTeleporter::HandleStateChanged(UGameplayObjectStateControllerCompo
                                              bool bChangedImmediately)
 {
 	Super::HandleStateChanged(Component, NewState, bChangedImmediately);
-	
+
 	if (NewState == EGameplayObjectState::Active)
 	{
 		if (LevelToLoad.GetAssetName() != "")
@@ -46,13 +46,8 @@ void AD2JLevelTeleporter::HandleTriggerBeginOverlap(UPrimitiveComponent* Overlap
 	                                 bFromSweep,
 	                                 SweepResult);
 
-	if (!OtherActor->GetClass()->ImplementsInterface(UD2JPlayerInterface::StaticClass()))
-	{
-		return;
-	}
-
-	ID2JPlayerInterface* PlayerInterface = Cast<ID2JPlayerInterface>(OtherActor);
-	PlayerInterface->ToggleInput(false);
+	ATrickyGameModeBase* GameMode = Cast<ATrickyGameModeBase>(GetWorld()->GetAuthGameMode());
+	GameMode->Execute_FinishGame(GameMode, EGameResult::Win);
 }
 
 void AD2JLevelTeleporter::HandleCameraFadeInFinished()
