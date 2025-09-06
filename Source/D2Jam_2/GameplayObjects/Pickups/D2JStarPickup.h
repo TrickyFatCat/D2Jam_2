@@ -42,6 +42,9 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Pickup")
 	TObjectPtr<AD2JStarPickup> NextStar = nullptr;
 
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Pickup")
+	TSoftObjectPtr<UWorld> LevelToLoad = nullptr;
+
 	virtual bool CanBeActivated_Implementation(AActor* Activator) override;
 
 	virtual void HandleActivationSuccess_Implementation(AActor* Activator) override;
@@ -50,4 +53,7 @@ protected:
 	void HandleStateChanged(UGameplayObjectStateControllerComponent* Component,
 	                        EGameplayObjectState NewState,
 	                        bool bChangedImmediately);
+
+	UFUNCTION()
+	void OnLevelLoaded();
 };

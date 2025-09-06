@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "D2Jam_2/PlayerCharacter/D2JPlayerInterface.h"
 #include "GameplayObject/GameplayObjectStateControllerComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AD2JStarPickup::AD2JStarPickup()
@@ -87,6 +88,20 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 		MeshComponent->SetHiddenInGame(false);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		MeshComponent->SetHiddenInGame(false);
+
+		if (LevelToLoad.GetAssetName() != "")
+		{
+			FLatentActionInfo LatentActionInfo;
+			LatentActionInfo.CallbackTarget = this;
+			LatentActionInfo.ExecutionFunction = FName("OnLevelLoaded");
+			LatentActionInfo.UUID = GetUniqueID();
+			LatentActionInfo.Linkage = 0;
+			UGameplayStatics::LoadStreamLevelBySoftObjectPtr(this,
+			                                                 LevelToLoad,
+			                                                 true,
+			                                                 true,
+			                                                 LatentActionInfo);
+		}
 		break;
 
 	case EGameplayObjectState::Inactive:
@@ -96,4 +111,11 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 		MeshComponent->SetHiddenInGame(true);
 		break;
 	}
+}
+
+void AD2JStarPickup::OnLevelLoaded()
+{
+#if WITH_EDITOR
+	UE_LOG(LogTemp, Log, TEXT("Sublevel loaded."))
+#endif
 }
