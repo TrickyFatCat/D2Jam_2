@@ -111,13 +111,7 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 	case EGameplayObjectState::Inactive:
 		MeshComponent->SetHiddenInGame(true);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 		MeshComponent->SetHiddenInGame(true);
-
-		if (TeleporterToActivate.IsValid())
-		{
-			Execute_ActivateGameplayObject(TeleporterToActivate.Get(), true);
-		}
 		break;
 	}
 }

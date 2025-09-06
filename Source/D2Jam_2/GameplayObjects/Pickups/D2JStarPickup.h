@@ -46,9 +46,6 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Pickup")
 	TSoftObjectPtr<UWorld> SublevelToLoad = nullptr;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Pickup")
-	TWeakObjectPtr<AD2JTeleporterBase> TeleporterToActivate = nullptr;
-
 	virtual bool CanBeActivated_Implementation(AActor* Activator) override;
 
 	virtual void HandleActivationSuccess_Implementation(AActor* Activator) override;
