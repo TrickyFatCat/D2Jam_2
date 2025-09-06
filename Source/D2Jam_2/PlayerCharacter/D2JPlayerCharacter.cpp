@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "TrickyGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 AD2JPlayerCharacter::AD2JPlayerCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -35,9 +36,9 @@ void AD2JPlayerCharacter::BeginPlay()
 	SpawnLocation = GetActorLocation();
 
 	OnTakeAnyDamage.AddUniqueDynamic(this, &AD2JPlayerCharacter::HandleAnyDamageTaken);
-	
+
 	ATrickyGameModeBase* GameMode = UTrickyGameModeLibrary::GetTrickyGameMode(this);
-	
+
 	if (IsValid(GameMode))
 	{
 		GameMode->OnGameStarted.AddDynamic(this, &AD2JPlayerCharacter::HandleGameStarted);
@@ -105,7 +106,7 @@ void AD2JPlayerCharacter::ToggleInput(const bool bIsEnabled)
 	{
 		return;
 	}
-	
+
 	if (bIsEnabled)
 	{
 		EnableInput(PlayerController);
@@ -114,7 +115,7 @@ void AD2JPlayerCharacter::ToggleInput(const bool bIsEnabled)
 	{
 		DisableInput(PlayerController);
 	}
-	
+
 	GetMovementComponent()->StopMovementImmediately();
 }
 
@@ -140,9 +141,63 @@ void AD2JPlayerCharacter::Move(const FInputActionValue& Value)
 	AddMovementInput(MovementDirection, ControlLength);
 }
 
+void AD2JPlayerCharacter::StartRespawn()
+{
+	ToggleInput(false);
+	OnRespawnStarted();
+	
+	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
+
+	if (!IsValid(CameraManager))
+	{
+		Respawn();
+		return;
+	}
+
+	CameraManager->StartCameraFade(0.0f, 1.0f, RespawnFadeInDuration, FLinearColor::Black, false, true);
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle,
+	                                this,
+	                                &AD2JPlayerCharacter::Respawn,
+	                                RespawnFadeInDuration,
+	                                false);
+}
+
+void AD2JPlayerCharacter::FinishRespawn()
+{
+	OnRespawnFinished();
+	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
+
+	if (!IsValid(CameraManager))
+	{
+		ToggleInput(true);
+		return;
+	}
+
+	CameraManager->StartCameraFade(1.0f, 0.0f, RespawnFadeOutDuration, FLinearColor::Black, false, false);
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle,
+	                                this,
+	                                &AD2JPlayerCharacter::HandleRespawnFinished,
+	                                RespawnFadeOutDuration,
+	                                false);
+}
+
+void AD2JPlayerCharacter::HandleRespawnFinished()
+{
+	ToggleInput(true);
+}
+
 void AD2JPlayerCharacter::Respawn()
 {
 	SetActorLocation(SpawnLocation);
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle,
+									this,
+									&AD2JPlayerCharacter::FinishRespawn,
+									RespawnDuration,
+									false);
 }
 
 void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
@@ -153,6 +208,7 @@ void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
 {
 	FailureCounter++;
 	OnFailureCounterIncreased.Broadcast(FailureCounter);
+	StartRespawn();
 }
 
 void AD2JPlayerCharacter::HandleGameStarted()
