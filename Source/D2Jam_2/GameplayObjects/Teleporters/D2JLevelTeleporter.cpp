@@ -3,13 +3,33 @@
 
 #include "D2JLevelTeleporter.h"
 
-#include "TrickyGameModeBase.h"
+#include "D2Jam_2/PlayerCharacter/D2JPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 
 AD2JLevelTeleporter::AD2JLevelTeleporter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+}
+
+void AD2JLevelTeleporter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
+void AD2JLevelTeleporter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (bIsFinish)
+	{
+		AD2JPlayerCharacter* Player = Cast<AD2JPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+		if (IsValid(Player) && !Player->OnAllStarsGathered.IsAlreadyBound(this, &AD2JLevelTeleporter::HandleAllStarsGathered))
+		{
+			Player->OnAllStarsGathered.AddDynamic(this, &AD2JLevelTeleporter::HandleAllStarsGathered);
+		}
+	}
 }
 
 void AD2JLevelTeleporter::HandleStateChanged(UGameplayObjectStateControllerComponent* Component,
@@ -45,12 +65,14 @@ void AD2JLevelTeleporter::HandleTriggerBeginOverlap(UPrimitiveComponent* Overlap
 	                                 OtherBodyIndex,
 	                                 bFromSweep,
 	                                 SweepResult);
-
-	ATrickyGameModeBase* GameMode = Cast<ATrickyGameModeBase>(GetWorld()->GetAuthGameMode());
-	GameMode->Execute_FinishGame(GameMode, EGameResult::Win);
 }
 
 void AD2JLevelTeleporter::HandleCameraFadeInFinished()
 {
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, LevelToLoad, true);
+}
+
+void AD2JLevelTeleporter::HandleAllStarsGathered()
+{
+	Execute_ActivateGameplayObject(this, true);
 }

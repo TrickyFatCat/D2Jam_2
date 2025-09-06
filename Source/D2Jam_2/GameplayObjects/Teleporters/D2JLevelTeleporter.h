@@ -14,7 +14,14 @@ class D2JAM_2_API AD2JLevelTeleporter : public AD2JTeleporterBase
 public:
 	AD2JLevelTeleporter();
 
+	virtual void PostInitializeComponents() override;
+
+	virtual void BeginPlay() override;
+
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
+	bool bIsFinish = false;
+	
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Teleporter")
 	TSoftObjectPtr<UWorld> LevelToLoad = nullptr;
 
@@ -30,4 +37,7 @@ protected:
 	                                       const FHitResult& SweepResult) override;
 
 	virtual void HandleCameraFadeInFinished() override;
+
+	UFUNCTION()
+	void HandleAllStarsGathered();
 };

@@ -3,11 +3,15 @@
 
 #include "D2JTeleporterBase.h"
 
+#include "TrickyGameModeBase.h"
+#include "TrickyGameModeLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Components/MeshComponent.h"
 #include "GameplayObject/GameplayObjectStateControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
+class ATrickyGameModeBase;
 
 AD2JTeleporterBase::AD2JTeleporterBase()
 {
@@ -82,6 +86,13 @@ void AD2JTeleporterBase::HandleTriggerBeginOverlap(UPrimitiveComponent* Overlapp
                                                    bool bFromSweep,
                                                    const FHitResult& SweepResult)
 {
+	ATrickyGameModeBase* GameMode = UTrickyGameModeLibrary::GetTrickyGameMode(this);
+
+	if (IsValid(GameMode))
+	{
+		GameMode->Execute_FinishGame(GameMode, EGameResult::Win);
+	}
+	
 	if (ActivationDelay <= 0.f)
 	{
 		HandleActivationTimerFinished();
