@@ -20,7 +20,7 @@ class D2JAM_2_API AD2JPlayerCharacter : public ACharacter, public ID2JPlayerInte
 	GENERATED_BODY()
 
 public:
-	AD2JPlayerCharacter();
+	AD2JPlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void BeginPlay() override;
@@ -49,6 +49,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* JumpAction = nullptr;
 
 	UFUNCTION(BlueprintCallable)
 	void CalculateDirectionFromControls(const FVector2D& ControlValue, FVector& OutDirection) const;

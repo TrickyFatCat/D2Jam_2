@@ -3,13 +3,15 @@
 
 #include "D2JPlayerCharacter.h"
 
+#include "D2JPlayerMovementComponent.h"
 #include "GameStateControllerInterface.h"
 #include "TrickyGameModeLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetMathLibrary.h"
 
-AD2JPlayerCharacter::AD2JPlayerCharacter()
+AD2JPlayerCharacter::AD2JPlayerCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UD2JPlayerMovementComponent>(TEXT("CharMoveComp")))
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -17,7 +19,7 @@ AD2JPlayerCharacter::AD2JPlayerCharacter()
 void AD2JPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 
 	if (IsValid(PlayerController))
@@ -43,6 +45,12 @@ void AD2JPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		//Movement
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AD2JPlayerCharacter::Move);
+
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AD2JPlayerCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction,
+		                                   ETriggerEvent::Completed,
+		                                   this,
+		                                   &AD2JPlayerCharacter::StopJumping);
 	}
 }
 
