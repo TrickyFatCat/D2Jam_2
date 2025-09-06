@@ -8,6 +8,10 @@
 #include "GameFramework/Character.h"
 #include "D2JPlayerCharacter.generated.h"
 
+class UInputAction;
+class UInputMappingContext;
+struct FInputActionValue;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStarAddedDynamicSignature, const FTrickyPropertyInt&, CurrentStars);
 
 UCLASS()
@@ -36,4 +40,19 @@ public:
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Player")
 	FTrickyPropertyInt Stars {0, 0, 3};
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	float YawOffset = -45.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputMappingContext* MappingContext = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* MoveAction = nullptr;
+
+	UFUNCTION(BlueprintCallable)
+	void CalculateDirectionFromControls(const FVector2D& ControlValue, FVector& OutDirection) const;
+	
+	UFUNCTION()
+	void Move(const FInputActionValue& Value);
 };
