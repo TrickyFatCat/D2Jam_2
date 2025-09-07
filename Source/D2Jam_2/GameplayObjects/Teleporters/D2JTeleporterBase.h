@@ -6,6 +6,7 @@
 #include "D2Jam_2/GameplayObjects/D2JGameplayObjectBase.h"
 #include "D2JTeleporterBase.generated.h"
 
+class UTimelineComponent;
 class USphereComponent;
 
 UCLASS()
@@ -29,6 +30,12 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UMeshComponent> MeshComponent = nullptr;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UTimelineComponent> AnimationComponent = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
+	UCurveFloat* AnimationCurve = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
 	float ActivationDelay = 3.f;
 
@@ -40,6 +47,15 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="Teleporter")
 	FTimerHandle ActivationTimerHandle;
+
+	UPROPERTY()
+	TWeakObjectPtr<AActor> TargetActor = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
+	float ActorDeltaLocation = -100.f;
+
+	UPROPERTY()
+	FVector TargetLocation = FVector::ZeroVector;
 
 	UFUNCTION()
 	virtual void HandleStateChanged(UGameplayObjectStateControllerComponent* Component,
@@ -55,8 +71,11 @@ protected:
 	                                       const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void HandleActivationTimerFinished();
+	virtual void HandleCameraFadeInFinished();
 
 	UFUNCTION()
-	virtual void HandleCameraFadeInFinished();
+	void AnimateTargetActor(const float Progress);
+
+	UFUNCTION()
+	void FinishAnimation();
 };
