@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "D2JTeleporterBase.h"
+#include "D2Jam_2/Core/D2JSaveGame.h"
 #include "D2JLevelTeleporter.generated.h"
+
+class UD2JGameInstance;
 
 UCLASS()
 class D2JAM_2_API AD2JLevelTeleporter : public AD2JTeleporterBase
@@ -21,6 +24,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
 	bool bIsFinish = false;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Teleporter", meta=(EditCondition="!bIsFinish"))
+	TSoftObjectPtr<UWorld> RequiredLevel = nullptr;
 	
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Teleporter")
 	TSoftObjectPtr<UWorld> LevelToLoad = nullptr;
@@ -40,4 +46,13 @@ protected:
 
 	UFUNCTION()
 	void HandleAllStarsGathered();
+
+	UFUNCTION(BlueprintPure)
+	void GetLevelToLoadName(FString& OutName) const;
+
+	UPROPERTY(BlueprintReadOnly, Category="Teleporter")
+	FLevelData LevelSaveData;
+
+	UFUNCTION()
+	void HandleSaveDataLoaded();
 };

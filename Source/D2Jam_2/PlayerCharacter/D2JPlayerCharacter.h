@@ -59,6 +59,8 @@ public:
 
 	virtual void ToggleInput(const bool bIsEnabled) override;
 
+	int32 GetFailureCounter() const { return FailureCounter; }
+
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Player")
 	FTrickyPropertyInt Stars{0, 0, 3};
