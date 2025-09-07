@@ -23,7 +23,7 @@ void AD2JGameplayObjectBase::PostEditChangeProperty(struct FPropertyChangedEvent
 	
 	const EGameplayObjectState InitialState = bIsActiveOnStart
 												  ? EGameplayObjectState::Active
-												  : EGameplayObjectState::Disabled;
+												  : EGameplayObjectState::Inactive;
 	StateControllerComponent->SetInitialState(InitialState);
 }
 #endif
