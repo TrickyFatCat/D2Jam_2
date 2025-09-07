@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "TrickyGameModeBase.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -106,6 +107,7 @@ void AD2JPlayerCharacter::GetStarsData(FTrickyPropertyInt& OutStarsData) const
 void AD2JPlayerCharacter::SetSpawnLocation(const FVector NewSpawnLocation)
 {
 	SpawnLocation = NewSpawnLocation;
+	SpawnLocation.Z += GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 }
 
 void AD2JPlayerCharacter::ToggleInput(const bool bIsEnabled)
