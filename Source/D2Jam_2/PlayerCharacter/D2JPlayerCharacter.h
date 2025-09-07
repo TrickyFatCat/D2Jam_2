@@ -19,6 +19,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllStarsGatheredDynamicSignature);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFailureCounterIncreasedDynamicSignature, int32, CurrentFailures);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJumpStartedDynamicSignature);
+
 UCLASS()
 class D2JAM_2_API AD2JPlayerCharacter : public ACharacter, public ID2JPlayerInterface
 {
@@ -29,6 +31,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Jump() override;
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -43,6 +47,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Player")
 	FOnFailureCounterIncreasedDynamicSignature OnFailureCounterIncreased;
+
+	UPROPERTY(BlueprintAssignable, Category="Player")
+	FOnJumpStartedDynamicSignature OnJumpStarted;
 
 	virtual void AddStar() override;
 

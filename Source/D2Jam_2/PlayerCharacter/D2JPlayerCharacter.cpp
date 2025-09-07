@@ -52,6 +52,16 @@ void AD2JPlayerCharacter::BeginPlay()
 	}
 }
 
+void AD2JPlayerCharacter::Jump()
+{
+	if (GetCharacterMovement()->IsMovingOnGround())
+	{
+		OnJumpStarted.Broadcast();
+	}
+	
+	Super::Jump();
+}
+
 void AD2JPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -145,7 +155,7 @@ void AD2JPlayerCharacter::StartRespawn()
 {
 	ToggleInput(false);
 	OnRespawnStarted();
-	
+
 	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 
 	if (!IsValid(CameraManager))
@@ -194,10 +204,10 @@ void AD2JPlayerCharacter::Respawn()
 
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
-									this,
-									&AD2JPlayerCharacter::FinishRespawn,
-									RespawnDuration,
-									false);
+	                                this,
+	                                &AD2JPlayerCharacter::FinishRespawn,
+	                                RespawnDuration,
+	                                false);
 }
 
 void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
