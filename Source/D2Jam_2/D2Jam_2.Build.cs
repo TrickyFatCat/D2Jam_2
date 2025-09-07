@@ -10,7 +10,7 @@ public class D2Jam_2 : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "TrickyProperties", "TrickyGameplayObjects", "TrickyGameMode" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "TrickyProperties", "TrickyGameplayObjects", "TrickyGameMode", "TrickyUtilities" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
