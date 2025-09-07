@@ -26,7 +26,7 @@ bool UD2JUtils::GetLevelSaveData(UObject* WorldContextObject, const FString& Lev
 	}
 
 	TArray<FLevelData> LevelData;
-	JamInstance->GetLevelData(LevelData);
+	JamInstance->GetSavedLevelData(LevelData);
 
 	if (LevelData.IsEmpty())
 	{

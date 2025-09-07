@@ -65,12 +65,13 @@ bool UD2JGameInstance::LoadGameData(TArray<FLevelData>& OutSaveGameData)
 		return false;
 	}
 
-	LevelData = SaveGame->SaveGameData;
-	OutSaveGameData = LevelData;
+	SavedLevelData = SaveGame->SaveGameData;
+	OutSaveGameData = SavedLevelData;
+	OnSaveGameLoaded.Broadcast();
 	return true;
 }
 
-void UD2JGameInstance::GetLevelData(TArray<FLevelData>& OutLevelData)
+void UD2JGameInstance::GetSavedLevelData(TArray<FLevelData>& OutSavedLevelData)
 {
-	OutLevelData = LevelData;
+	OutSavedLevelData = SavedLevelData;
 }

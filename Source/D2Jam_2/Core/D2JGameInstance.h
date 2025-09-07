@@ -7,6 +7,8 @@
 #include "Engine/GameInstance.h"
 #include "D2JGameInstance.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveGameLoadedDynamicSignature);
+
 /**
  * 
  */
@@ -16,6 +18,9 @@ class D2JAM_2_API UD2JGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable, Category = "SaveGame")
+	FOnSaveGameLoadedDynamicSignature OnSaveGameLoaded;
+	
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
 	bool SaveGameData();
 
@@ -23,7 +28,7 @@ public:
 	bool LoadGameData(TArray<FLevelData>& OutSaveGameData);
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
-	void GetLevelData(TArray<FLevelData>& OutLevelData);
+	void GetSavedLevelData(TArray<FLevelData>& OutSavedLevelData);
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SaveGame")
@@ -31,5 +36,5 @@ protected:
 
 	FString SaveGameName = "D2JSaveGame";
 
-	TArray<FLevelData> LevelData;
+	TArray<FLevelData> SavedLevelData;
 };
