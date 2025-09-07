@@ -16,6 +16,7 @@ class D2JAM_2_API UD2JUtils : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+public:
 	UFUNCTION(BlueprintPure, Category = "Utils", meta=(DefaultToSelf="WorldContextObject"))
 	static UD2JGameInstance* GetJamInstance(UObject* WorldContextObject);
 
