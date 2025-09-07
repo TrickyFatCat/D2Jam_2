@@ -111,6 +111,7 @@ void AD2JLevelTeleporter::HandleSaveDataLoaded()
 	if (bHasSavedData)
 	{
 		Execute_ActivateGameplayObject(this, true);
+		OnSaveDataLoaded();
 		return;
 	}
 
@@ -126,6 +127,7 @@ void AD2JLevelTeleporter::HandleSaveDataLoaded()
 	if (bHasSavedData)
 	{
 		Execute_ActivateGameplayObject(this, true);
+		OnSaveDataLoaded();
 	}
 	else
 	{

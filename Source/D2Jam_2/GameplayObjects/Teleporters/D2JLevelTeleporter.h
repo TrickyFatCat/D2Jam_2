@@ -55,4 +55,7 @@ protected:
 
 	UFUNCTION()
 	void HandleSaveDataLoaded();
+
+	UFUNCTION(BlueprintImplementableEvent, Category="Teleporter")
+	void OnSaveDataLoaded();
 };
