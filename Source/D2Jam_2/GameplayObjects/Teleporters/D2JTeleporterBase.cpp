@@ -5,8 +5,10 @@
 
 #include "TrickyGameModeBase.h"
 #include "TrickyGameModeLibrary.h"
+#include "TrickyUtilityLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Components/MeshComponent.h"
+#include "Components/TimelineComponent.h"
 #include "GameplayObject/GameplayObjectStateControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -19,15 +21,16 @@ AD2JTeleporterBase::AD2JTeleporterBase()
 
 	ActivationTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("ActivationTrigger"));
 	ActivationTrigger->SetupAttachment(GetRootComponent());
-	ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	ActivationTrigger->SetCollisionResponseToAllChannels(ECR_Ignore);
-	ActivationTrigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Overlap);
+	ActivationTrigger->SetCollisionProfileName(TEXT("PawnTrigger"));
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	MeshComponent->SetupAttachment(GetRootComponent());
 	MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+
+	AnimationComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("AnimationComponent"));
 }
 
+#if WITH_EDITOR
 void AD2JTeleporterBase::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -44,7 +47,14 @@ void AD2JTeleporterBase::PostEditChangeProperty(struct FPropertyChangedEvent& Pr
 		                                              ? ECollisionEnabled::QueryOnly
 		                                              : ECollisionEnabled::NoCollision;
 	ActivationTrigger->SetCollisionEnabled(CollisionType);
+
+	if (IsValid(AnimationComponent))
+	{
+		UTrickyUtilityLibrary::CalculateTimelinePlayRate(AnimationComponent, ActivationDelay);
+		AnimationComponent->SetFloatCurve(AnimationCurve, "Progress");
+	}
 }
+#endif
 
 void AD2JTeleporterBase::PostInitializeComponents()
 {
@@ -56,7 +66,16 @@ void AD2JTeleporterBase::PostInitializeComponents()
 		                                                            &AD2JTeleporterBase::HandleTriggerBeginOverlap);
 
 		StateControllerComponent->OnGameplayObjectStateChanged.AddDynamic(this,
-		                                                                 &AD2JTeleporterBase::HandleStateChanged);
+		                                                                  &AD2JTeleporterBase::HandleStateChanged);
+
+		FOnTimelineFloat TeleportAnimationDelegate;
+		TeleportAnimationDelegate.BindUFunction(this, TEXT("AnimateTargetActor"));
+		AnimationComponent->SetTimelineLength(1.f);
+		AnimationComponent->AddInterpFloat(AnimationCurve, TeleportAnimationDelegate, NAME_None, "Progress");
+
+		FOnTimelineEvent FinishAnimationDelegate;
+		FinishAnimationDelegate.BindUFunction(this, TEXT("FinishAnimation"));
+		AnimationComponent->SetTimelineFinishedFunc(FinishAnimationDelegate);
 	}
 }
 
@@ -64,7 +83,6 @@ void AD2JTeleporterBase::HandleStateChanged(UGameplayObjectStateControllerCompon
                                             EGameplayObjectState NewState,
                                             bool bChangedImmediately)
 {
-	
 	switch (NewState)
 	{
 	case EGameplayObjectState::Active:
@@ -86,26 +104,50 @@ void AD2JTeleporterBase::HandleTriggerBeginOverlap(UPrimitiveComponent* Overlapp
                                                    bool bFromSweep,
                                                    const FHitResult& SweepResult)
 {
+	if (!IsValid(OtherActor))
+	{
+		return;
+	}
 	ATrickyGameModeBase* GameMode = UTrickyGameModeLibrary::GetTrickyGameMode(this);
 
 	if (IsValid(GameMode))
 	{
 		GameMode->Execute_FinishGame(GameMode, EGameResult::Win);
 	}
-	
+
 	if (ActivationDelay <= 0.f)
 	{
-		HandleActivationTimerFinished();
+		FinishAnimation();
 		return;
 	}
 
-	GetWorldTimerManager().SetTimer(ActivationTimerHandle,
-	                                this,
-	                                &AD2JTeleporterBase::HandleActivationTimerFinished,
-	                                ActivationDelay);
+	TargetActor = OtherActor;
+	TargetActor->SetActorEnableCollision(ECollisionEnabled::NoCollision);
+	TargetActor->SetCanBeDamaged(false);
+	TargetActor->SetActorLocationAndRotation(GetActorLocation(), GetActorRotation());
+	TargetLocation = GetActorLocation();
+	TargetLocation.Z += ActorDeltaLocation;
+	AnimationComponent->PlayFromStart();
+
+	ActivationTrigger->OnComponentBeginOverlap.RemoveDynamic(this, &AD2JTeleporterBase::HandleTriggerBeginOverlap);
 }
 
-void AD2JTeleporterBase::HandleActivationTimerFinished()
+void AD2JTeleporterBase::HandleCameraFadeInFinished()
+{
+}
+
+void AD2JTeleporterBase::AnimateTargetActor(const float Progress)
+{
+	if (!TargetActor.IsValid())
+	{
+		return;
+	}
+
+	FVector NewLocation = FMath::Lerp(GetActorLocation(), TargetLocation, Progress);
+	TargetActor->SetActorLocation(NewLocation);
+}
+
+void AD2JTeleporterBase::FinishAnimation()
 {
 	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 
@@ -119,8 +161,4 @@ void AD2JTeleporterBase::HandleActivationTimerFinished()
 		                                CameraFadeInDuration,
 		                                false);
 	}
-}
-
-void AD2JTeleporterBase::HandleCameraFadeInFinished()
-{
 }
