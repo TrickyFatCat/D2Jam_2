@@ -40,4 +40,7 @@ protected:
 
 	UFUNCTION()
 	void HandleAllStarsGathered();
+
+	UFUNCTION(BlueprintPure)
+	void GetLevelToLoadName(FString& OutName) const;
 };
