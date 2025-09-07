@@ -34,7 +34,7 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UStaticMeshComponent> MeshComponent = nullptr;
 
-	UPROPERTY(BlueprintReadOnly, Category="Components")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UGameplayObjectStateControllerComponent> StateControllerComponent = nullptr;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Pickup")
