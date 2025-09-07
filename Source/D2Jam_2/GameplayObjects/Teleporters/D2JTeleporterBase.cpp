@@ -38,7 +38,7 @@ void AD2JTeleporterBase::PostEditChangeProperty(struct FPropertyChangedEvent& Pr
 		                                          : EGameplayObjectState::Inactive;
 	StateControllerComponent->SetInitialState(InitialState);
 
-	MeshComponent->SetHiddenInGame(!bIsActiveOnStart);
+	MeshComponent->SetHiddenInGame(!bIsActiveOnStart, true);
 
 	const ECollisionEnabled::Type CollisionType = bIsActiveOnStart
 		                                              ? ECollisionEnabled::QueryOnly
@@ -69,12 +69,12 @@ void AD2JTeleporterBase::HandleStateChanged(UGameplayObjectStateControllerCompon
 	{
 	case EGameplayObjectState::Active:
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		MeshComponent->SetHiddenInGame(false);
+		MeshComponent->SetHiddenInGame(false, true);
 		break;
 
 	case EGameplayObjectState::Inactive:
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		MeshComponent->SetHiddenInGame(true);
+		MeshComponent->SetHiddenInGame(true, true);
 		break;
 	}
 }

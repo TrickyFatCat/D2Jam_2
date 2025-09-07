@@ -115,7 +115,13 @@ bool UGameplayObjectStateControllerComponent::FinishGameplayObjetStateTransition
 		return false;
 	}
 
-	return ChangeCurrentState(TargetState, true);
+	if (ChangeCurrentState(TargetState, true))
+	{
+		OnGameplayObjectStateTransitionFinished.Broadcast(this, TargetState);
+		return true;
+	}
+
+	return false;
 }
 
 bool UGameplayObjectStateControllerComponent::ReverseGameplayObjectStateTransition_Implementation()
