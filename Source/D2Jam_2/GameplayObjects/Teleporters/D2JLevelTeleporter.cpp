@@ -115,6 +115,7 @@ void AD2JLevelTeleporter::HandleSaveDataLoaded()
 		return;
 	}
 
+	OnSaveDataLoaded();
 	if (RequiredLevel.GetAssetName() == "")
 	{
 		Execute_ActivateGameplayObject(this, true);
@@ -127,10 +128,11 @@ void AD2JLevelTeleporter::HandleSaveDataLoaded()
 	if (bHasSavedData)
 	{
 		Execute_ActivateGameplayObject(this, true);
-		OnSaveDataLoaded();
 	}
 	else
 	{
 		Execute_DeactivateGameplayObject(this, true);
 	}
+	
+	OnSaveDataLoaded();
 }

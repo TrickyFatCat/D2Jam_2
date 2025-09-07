@@ -62,7 +62,8 @@ bool UD2JGameInstance::LoadGameData(TArray<FLevelData>& OutSaveGameData)
 
 	if (!IsValid(SaveGame))
 	{
-		return false;
+		SaveGame = Cast<UD2JSaveGame>(UGameplayStatics::CreateSaveGameObject(UD2JSaveGame::StaticClass()));
+		UGameplayStatics::SaveGameToSlot(SaveGame, SaveGameName, 0);
 	}
 
 	SavedLevelData = SaveGame->SaveGameData;
