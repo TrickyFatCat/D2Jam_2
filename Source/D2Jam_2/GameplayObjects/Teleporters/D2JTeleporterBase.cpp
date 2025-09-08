@@ -131,6 +131,7 @@ void AD2JTeleporterBase::HandleTriggerBeginOverlap(UPrimitiveComponent* Overlapp
 	TargetLocation.Z += ActorDeltaLocation;
 	AnimationComponent->PlayFromStart();
 
+	UGameplayStatics::PlaySound2D(this, TeleportationSound);
 	ActivationTrigger->OnComponentBeginOverlap.RemoveDynamic(this, &AD2JTeleporterBase::HandleTriggerBeginOverlap);
 }
 

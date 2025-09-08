@@ -34,6 +34,9 @@ protected:
 	TObjectPtr<UTimelineComponent> AnimationComponent = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
+	USoundBase* TeleportationSound = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
 	UCurveFloat* AnimationCurve = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Teleporter")
