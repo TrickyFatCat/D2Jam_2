@@ -257,7 +257,7 @@ void AD2JPlayerCharacter::StartExitGame()
 	}
 
 	constexpr float ExitFadeInDuration = 0.5f;
-	CameraManager->StartCameraFade(0.0f, 1.0f, ExitFadeInDuration, FLinearColor::Black, false, false);
+	CameraManager->StartCameraFade(0.0f, 1.0f, ExitFadeInDuration, FLinearColor::Black, false, true);
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
 	                                this,
