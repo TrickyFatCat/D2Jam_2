@@ -89,9 +89,8 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 	switch (NewState)
 	{
 	case EGameplayObjectState::Active:
-		MeshComponent->SetHiddenInGame(false);
+		MeshComponent->SetHiddenInGame(false, true);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		MeshComponent->SetHiddenInGame(false);
 
 		if (SublevelToLoad.GetAssetName() != "")
 		{
@@ -109,9 +108,8 @@ void AD2JStarPickup::HandleStateChanged(UGameplayObjectStateControllerComponent*
 		break;
 
 	case EGameplayObjectState::Inactive:
-		MeshComponent->SetHiddenInGame(true);
+		MeshComponent->SetHiddenInGame(true, true);
 		ActivationTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		MeshComponent->SetHiddenInGame(true);
 		break;
 	}
 }
