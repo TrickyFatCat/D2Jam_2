@@ -101,7 +101,7 @@ protected:
 	UFUNCTION()
 	void Move(const FInputActionValue& Value);
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category="Player")
 	void StartRespawn();
 
 	UFUNCTION(BlueprintImplementableEvent)

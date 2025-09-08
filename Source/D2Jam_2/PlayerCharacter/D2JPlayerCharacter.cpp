@@ -155,7 +155,6 @@ void AD2JPlayerCharacter::Move(const FInputActionValue& Value)
 
 void AD2JPlayerCharacter::StartRespawn()
 {
-	ToggleInput(false);
 	OnRespawnStarted();
 
 	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
@@ -182,6 +181,7 @@ void AD2JPlayerCharacter::FinishRespawn()
 
 	if (!IsValid(CameraManager))
 	{
+		SetCanBeDamaged(true);
 		ToggleInput(true);
 		return;
 	}
@@ -197,12 +197,14 @@ void AD2JPlayerCharacter::FinishRespawn()
 
 void AD2JPlayerCharacter::HandleRespawnFinished()
 {
+	SetCanBeDamaged(true);
 	ToggleInput(true);
 }
 
 void AD2JPlayerCharacter::Respawn()
 {
 	SetActorLocation(SpawnLocation);
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.f, nullptr);
 
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
@@ -220,7 +222,8 @@ void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
 {
 	FailureCounter++;
 	OnFailureCounterIncreased.Broadcast(FailureCounter);
-	StartRespawn();
+	ToggleInput(false);
+	SetCanBeDamaged(false);
 }
 
 void AD2JPlayerCharacter::HandleGameStarted()
