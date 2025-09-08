@@ -95,13 +95,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* JumpAction = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ExitAction = nullptr;
+
 	UFUNCTION(BlueprintCallable)
 	void CalculateDirectionFromControls(const FVector2D& ControlValue, FVector& OutDirection) const;
 
 	UFUNCTION()
 	void Move(const FInputActionValue& Value);
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category="Player")
 	void StartRespawn();
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -134,4 +137,10 @@ protected:
 
 	UFUNCTION()
 	void HandleGameFinished(const EGameResult Result);
+
+	UFUNCTION()
+	void StartExitGame();
+
+	UFUNCTION()
+	void FinishExitGame();
 };

@@ -59,7 +59,7 @@ void AD2JPlayerCharacter::Jump()
 	{
 		OnJumpStarted.Broadcast();
 	}
-	
+
 	Super::Jump();
 }
 
@@ -82,6 +82,8 @@ void AD2JPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		                                   ETriggerEvent::Completed,
 		                                   this,
 		                                   &AD2JPlayerCharacter::StopJumping);
+
+		EnhancedInputComponent->BindAction(ExitAction, ETriggerEvent::Triggered, this, &AD2JPlayerCharacter::StartExitGame);
 	}
 }
 
@@ -155,7 +157,6 @@ void AD2JPlayerCharacter::Move(const FInputActionValue& Value)
 
 void AD2JPlayerCharacter::StartRespawn()
 {
-	ToggleInput(false);
 	OnRespawnStarted();
 
 	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
@@ -166,7 +167,7 @@ void AD2JPlayerCharacter::StartRespawn()
 		return;
 	}
 
-	CameraManager->StartCameraFade(0.0f, 1.0f, RespawnFadeInDuration, FLinearColor::Black, false, true);
+	CameraManager->StartCameraFade(0.0f, 1.0f, RespawnFadeInDuration, FLinearColor::Black, true, true);
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
 	                                this,
@@ -182,11 +183,12 @@ void AD2JPlayerCharacter::FinishRespawn()
 
 	if (!IsValid(CameraManager))
 	{
+		SetCanBeDamaged(true);
 		ToggleInput(true);
 		return;
 	}
 
-	CameraManager->StartCameraFade(1.0f, 0.0f, RespawnFadeOutDuration, FLinearColor::Black, false, false);
+	CameraManager->StartCameraFade(1.0f, 0.0f, RespawnFadeOutDuration, FLinearColor::Black, true, false);
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
 	                                this,
@@ -197,12 +199,14 @@ void AD2JPlayerCharacter::FinishRespawn()
 
 void AD2JPlayerCharacter::HandleRespawnFinished()
 {
+	SetCanBeDamaged(true);
 	ToggleInput(true);
 }
 
 void AD2JPlayerCharacter::Respawn()
 {
 	SetActorLocation(SpawnLocation);
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.f, nullptr);
 
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
@@ -220,7 +224,8 @@ void AD2JPlayerCharacter::HandleAnyDamageTaken(AActor* DamagedActor,
 {
 	FailureCounter++;
 	OnFailureCounterIncreased.Broadcast(FailureCounter);
-	StartRespawn();
+	ToggleInput(false);
+	SetCanBeDamaged(false);
 }
 
 void AD2JPlayerCharacter::HandleGameStarted()
@@ -236,4 +241,32 @@ void AD2JPlayerCharacter::HandleGameStopped(const EGameInactivityReason Inactivi
 void AD2JPlayerCharacter::HandleGameFinished(const EGameResult Result)
 {
 	ToggleInput(false);
+}
+
+void AD2JPlayerCharacter::StartExitGame()
+{
+	ToggleInput(false);
+	SetCanBeDamaged(false);
+
+	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
+
+	if (!IsValid(CameraManager))
+	{
+		FinishExitGame();
+		return;
+	}
+
+	constexpr float ExitFadeInDuration = 0.5f;
+	CameraManager->StartCameraFade(0.0f, 1.0f, ExitFadeInDuration, FLinearColor::Black, true, true);
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle,
+	                                this,
+	                                &AD2JPlayerCharacter::FinishExitGame,
+	                                ExitFadeInDuration,
+	                                false);
+}
+
+void AD2JPlayerCharacter::FinishExitGame()
+{
+	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, false);
 }

@@ -5,6 +5,7 @@
 
 #include "D2JGameMode.h"
 #include "D2JSaveGame.h"
+#include "Components/AudioComponent.h"
 #include "D2Jam_2/PlayerCharacter/D2JPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -75,4 +76,14 @@ bool UD2JGameInstance::LoadGameData(TArray<FLevelData>& OutSaveGameData)
 void UD2JGameInstance::GetSavedLevelData(TArray<FLevelData>& OutSavedLevelData)
 {
 	OutSavedLevelData = SavedLevelData;
+}
+
+void UD2JGameInstance::StartPlayMusic(USoundBase* Music)
+{
+	if (IsValid(MusicComponent))
+	{
+		return;
+	}
+
+	UGameplayStatics::SpawnSound2D(GetWorld(), Music, 1, 1, 0, nullptr, false, true);
 }

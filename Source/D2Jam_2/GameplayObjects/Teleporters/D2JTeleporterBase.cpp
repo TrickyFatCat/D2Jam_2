@@ -50,7 +50,6 @@ void AD2JTeleporterBase::PostEditChangeProperty(struct FPropertyChangedEvent& Pr
 
 	if (IsValid(AnimationComponent))
 	{
-		UTrickyUtilityLibrary::CalculateTimelinePlayRate(AnimationComponent, ActivationDelay);
 		AnimationComponent->SetFloatCurve(AnimationCurve, "Progress");
 	}
 }
@@ -68,6 +67,7 @@ void AD2JTeleporterBase::PostInitializeComponents()
 		StateControllerComponent->OnGameplayObjectStateChanged.AddDynamic(this,
 		                                                                  &AD2JTeleporterBase::HandleStateChanged);
 
+		
 		FOnTimelineFloat TeleportAnimationDelegate;
 		TeleportAnimationDelegate.BindUFunction(this, TEXT("AnimateTargetActor"));
 		AnimationComponent->SetTimelineLength(1.f);
@@ -76,6 +76,8 @@ void AD2JTeleporterBase::PostInitializeComponents()
 		FOnTimelineEvent FinishAnimationDelegate;
 		FinishAnimationDelegate.BindUFunction(this, TEXT("FinishAnimation"));
 		AnimationComponent->SetTimelineFinishedFunc(FinishAnimationDelegate);
+		
+		UTrickyUtilityLibrary::CalculateTimelinePlayRate(AnimationComponent, ActivationDelay);
 	}
 }
 
@@ -129,6 +131,7 @@ void AD2JTeleporterBase::HandleTriggerBeginOverlap(UPrimitiveComponent* Overlapp
 	TargetLocation.Z += ActorDeltaLocation;
 	AnimationComponent->PlayFromStart();
 
+	UGameplayStatics::PlaySound2D(this, TeleportationSound);
 	ActivationTrigger->OnComponentBeginOverlap.RemoveDynamic(this, &AD2JTeleporterBase::HandleTriggerBeginOverlap);
 }
 
@@ -143,7 +146,7 @@ void AD2JTeleporterBase::AnimateTargetActor(const float Progress)
 		return;
 	}
 
-	FVector NewLocation = FMath::Lerp(GetActorLocation(), TargetLocation, Progress);
+	FVector NewLocation = FMath::Lerp(ActivationTrigger->GetComponentLocation(), TargetLocation, Progress);
 	TargetActor->SetActorLocation(NewLocation);
 }
 

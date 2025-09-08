@@ -29,8 +29,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
 	void GetSavedLevelData(TArray<FLevelData>& OutSavedLevelData);
+
+	UFUNCTION(BlueprintCallable, Category="Music")
+	void StartPlayMusic(USoundBase* Music);
 	
 protected:
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> MusicComponent = nullptr;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "SaveGame")
 	TObjectPtr<UD2JSaveGame> SaveGame = nullptr;
 
