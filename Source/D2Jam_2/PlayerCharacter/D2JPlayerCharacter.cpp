@@ -59,7 +59,7 @@ void AD2JPlayerCharacter::Jump()
 	{
 		OnJumpStarted.Broadcast();
 	}
-	
+
 	Super::Jump();
 }
 
@@ -82,6 +82,8 @@ void AD2JPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		                                   ETriggerEvent::Completed,
 		                                   this,
 		                                   &AD2JPlayerCharacter::StopJumping);
+
+		EnhancedInputComponent->BindAction(ExitAction, ETriggerEvent::Triggered, this, &AD2JPlayerCharacter::StartExitGame);
 	}
 }
 
@@ -239,4 +241,32 @@ void AD2JPlayerCharacter::HandleGameStopped(const EGameInactivityReason Inactivi
 void AD2JPlayerCharacter::HandleGameFinished(const EGameResult Result)
 {
 	ToggleInput(false);
+}
+
+void AD2JPlayerCharacter::StartExitGame()
+{
+	ToggleInput(false);
+	SetCanBeDamaged(false);
+
+	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
+
+	if (!IsValid(CameraManager))
+	{
+		FinishExitGame();
+		return;
+	}
+
+	constexpr float ExitFadeInDuration = 0.5f;
+	CameraManager->StartCameraFade(0.0f, 1.0f, ExitFadeInDuration, FLinearColor::Black, false, false);
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle,
+	                                this,
+	                                &AD2JPlayerCharacter::FinishExitGame,
+	                                ExitFadeInDuration,
+	                                false);
+}
+
+void AD2JPlayerCharacter::FinishExitGame()
+{
+	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, false);
 }
