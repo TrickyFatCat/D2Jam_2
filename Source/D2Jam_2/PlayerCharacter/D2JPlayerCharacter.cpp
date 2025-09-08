@@ -167,7 +167,7 @@ void AD2JPlayerCharacter::StartRespawn()
 		return;
 	}
 
-	CameraManager->StartCameraFade(0.0f, 1.0f, RespawnFadeInDuration, FLinearColor::Black, false, true);
+	CameraManager->StartCameraFade(0.0f, 1.0f, RespawnFadeInDuration, FLinearColor::Black, true, true);
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
 	                                this,
@@ -188,7 +188,7 @@ void AD2JPlayerCharacter::FinishRespawn()
 		return;
 	}
 
-	CameraManager->StartCameraFade(1.0f, 0.0f, RespawnFadeOutDuration, FLinearColor::Black, false, false);
+	CameraManager->StartCameraFade(1.0f, 0.0f, RespawnFadeOutDuration, FLinearColor::Black, true, false);
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
 	                                this,
@@ -257,7 +257,7 @@ void AD2JPlayerCharacter::StartExitGame()
 	}
 
 	constexpr float ExitFadeInDuration = 0.5f;
-	CameraManager->StartCameraFade(0.0f, 1.0f, ExitFadeInDuration, FLinearColor::Black, false, true);
+	CameraManager->StartCameraFade(0.0f, 1.0f, ExitFadeInDuration, FLinearColor::Black, true, true);
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle,
 	                                this,

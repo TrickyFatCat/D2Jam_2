@@ -9,7 +9,6 @@ void AD2JGameMode::StartPlay()
 {
 	Super::StartPlay();
 
-	
 	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 
 	if (IsValid(CameraManager))
@@ -17,13 +16,11 @@ void AD2JGameMode::StartPlay()
 		CameraManager->StartCameraFade(1.0f, 0.0f, CameraFadeOutDuration, FLinearColor::Black, true, false);
 		FTimerHandle TimerHandle;
 		GetWorldTimerManager().SetTimer(TimerHandle,
-		                                this,
-		                                &AD2JGameMode::HandleCameraFadeOutFinished,
-		                                CameraFadeOutDuration,
-		                                false);
+										this,
+										&AD2JGameMode::HandleCameraFadeOutFinished,
+										CameraFadeOutDuration,
+										false);
 	}
-
-	
 }
 
 void AD2JGameMode::HandleCameraFadeOutFinished()
